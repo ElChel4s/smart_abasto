@@ -10,7 +10,8 @@ export default function ListaPage() {
   const { cart, toggleCart } = useCart();
   const { showToast } = useToast();
   const [comprasHechas, setComprasHechas] = useState<string[]>([]);
-  const [alertasAgotado, setAlertasAgotado] = useState<Record<string, boolean>>({});
+  const [alertasStock, setAlertasStock] = useState<Record<string, 'AGOTADO' | 'PRECIO_INCORRECTO'>>({});
+  const [reportingId, setReportingId] = useState<string | null>(null);
   const [reemplazosDisponibles, setReemplazosDisponibles] = useState<Record<string, any[]>>({});
 
   const toggleCompra = (id: string) => {
@@ -19,30 +20,36 @@ export default function ListaPage() {
     );
   };
 
-  const reportarAgotado = async (item: any) => {
-    setAlertasAgotado(prev => ({ ...prev, [item.id]: true }));
-    showToast(`${item.prod.nombre} reportado como agotado. Buscando reemplazos...`, 'warning');
+  const handleReportar = async (item: any, tipo: 'AGOTADO' | 'PRECIO_INCORRECTO') => {
+    setAlertasStock(prev => ({ ...prev, [item.id]: tipo }));
+    setReportingId(null);
+    
+    if (tipo === 'AGOTADO') {
+      showToast(`${item.prod.nombre} reportado como agotado. Buscando reemplazos...`, 'warning');
 
-    // Buscar otras caseras en el mismo mercado que vendan el mismo producto
-    const caserasEnMercado = await getCaserasPorMercado(item.mercado.id);
-    // Para simplificar, buscamos si hay reemplazos (simulado usando otras caseras del repositorio)
-    const reemplazos = caserasEnMercado
-      .filter((c: any) => c.id !== item.casera.id)
-      .map((c: any) => ({
-        id: `inv_alt_${c.id}`,
-        casera: c,
-        precio: item.precio * 1.1, // Simulado
-        unidad: item.unidad
-      }));
+      // Buscar otras caseras en el mismo mercado que vendan el mismo producto
+      const caserasEnMercado = await getCaserasPorMercado(item.mercado.id);
+      // Para simplificar, buscamos si hay reemplazos (simulado usando otras caseras del repositorio)
+      const reemplazos = caserasEnMercado
+        .filter((c: any) => c.id !== item.casera.id)
+        .map((c: any) => ({
+          id: `inv_alt_${c.id}`,
+          casera: c,
+          precio: item.precio * 1.1, // Simulado
+          unidad: item.unidad
+        }));
 
-    setReemplazosDisponibles(prev => ({ ...prev, [item.id]: reemplazos }));
+      setReemplazosDisponibles(prev => ({ ...prev, [item.id]: reemplazos }));
+    } else {
+      showToast(`Precio desactualizado de ${item.prod.nombre} reportado. ¡Gracias!`, 'warning');
+    }
   };
 
   const aplicarReemplazo = (originalId: string, nuevoItem: any) => {
     // Reemplazar en el carrito
     showToast(`Producto reemplazado con la casera ${nuevoItem.casera.nombre}`, 'success');
     // Limpiar alertas
-    setAlertasAgotado(prev => {
+    setAlertasStock(prev => {
       const copy = { ...prev };
       delete copy[originalId];
       return copy;
@@ -101,11 +108,11 @@ export default function ListaPage() {
               
               {cart.map(item => {
                 const comprado = comprasHechas.includes(item.id);
-                const agotado = alertasAgotado[item.id];
+                const agotado = alertasStock[item.id];
                 const reemplazos = reemplazosDisponibles[item.id] || [];
 
                 return (
-                  <div key={item.id} className={`card-organic p-4 transition-all ${comprado ? 'opacity-60 bg-gray-50' : 'bg-white'} ${agotado ? 'border-yellow-300' : ''}`}>
+                  <div key={item.id} className={`card-organic p-4 transition-all ${comprado ? 'opacity-60 bg-gray-50' : 'bg-white'} ${agotado === 'AGOTADO' ? 'border-yellow-300 bg-yellow-50/20' : ''}`}>
                     <div className="flex items-center gap-3">
                       {/* Checkbox */}
                       <button 
@@ -121,12 +128,19 @@ export default function ListaPage() {
                         <h3 className={`font-bold text-[var(--texto-fuerte)] text-sm ${comprado ? 'line-through text-[var(--texto-suave)]' : ''}`}>
                           {item.prod.nombre}
                         </h3>
-                        <p className="text-[10px] text-[var(--texto-suave)] flex items-center gap-1 mt-0.5">
-                          <Store size={10} /> {item.casera.nombre} • Puesto {item.casera.puesto}
-                        </p>
+                        <div className="flex flex-wrap gap-x-2 gap-y-0.5 items-center mt-0.5">
+                          <Link href={`/casera/${item.casera.id}`} className="text-[10px] text-[var(--texto-suave)] font-bold hover:underline flex items-center gap-1">
+                            <Store size={10} /> {item.casera.nombre} (Puesto {item.casera.puesto})
+                          </Link>
+                        </div>
                         <p className="text-[9px] text-[var(--texto-suave)] flex items-center gap-1">
                           <MapPin size={9} /> {item.mercado.nombre}
                         </p>
+                        {!comprado && (
+                          <Link href={`/casera/${item.casera.id}?evaluar=true`} className="text-[8px] font-bold text-[var(--dorado-gamlp)] hover:underline bg-[var(--dorado-claro)] px-1.5 py-0.5 rounded border border-[var(--dorado-gamlp)]/30 flex items-center gap-0.5 mt-1 w-max">
+                            ⭐ Evaluar Casera
+                          </Link>
+                        )}
                       </div>
 
                       {/* Precio */}
@@ -139,13 +153,25 @@ export default function ListaPage() {
                     {/* Flujo de stock agotado y reemplazo */}
                     {!comprado && (
                       <div className="mt-3 pt-3 border-t border-dashed border-[var(--borde)] flex justify-between items-center">
-                        {agotado ? (
-                          <div className="text-[10px] text-yellow-600 font-bold flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded">
-                            <AlertTriangle size={12} /> Agotado reportado
+                        {reportingId === item.id ? (
+                          <div className="flex gap-1.5 items-center">
+                            <button onClick={() => handleReportar(item, 'AGOTADO')} className="bg-[var(--rojo-claro)] text-[var(--rojo-carmesi)] border border-[var(--rojo-carmesi)]/20 px-2 py-1 rounded text-[10px] font-bold">
+                              Agotado
+                            </button>
+                            <button onClick={() => handleReportar(item, 'PRECIO_INCORRECTO')} className="bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-1 rounded text-[10px] font-bold">
+                              Precio Antiguo
+                            </button>
+                            <button onClick={() => setReportingId(null)} className="text-[10px] text-gray-400 hover:text-gray-600 px-1">
+                              Volver
+                            </button>
+                          </div>
+                        ) : agotado ? (
+                          <div className={`text-[10px] font-bold flex items-center gap-1 px-2 py-1 rounded ${agotado === 'AGOTADO' ? 'text-red-600 bg-red-50' : 'text-yellow-600 bg-yellow-50'}`}>
+                            <AlertTriangle size={12} /> {agotado === 'AGOTADO' ? 'Agotado reportado' : 'Precio Incorrecto'}
                           </div>
                         ) : (
                           <button 
-                            onClick={() => reportarAgotado(item)}
+                            onClick={() => setReportingId(item.id)}
                             className="text-[10px] text-[var(--texto-suave)] hover:text-yellow-600 font-medium flex items-center gap-1"
                           >
                             <AlertTriangle size={12} /> ¿No tiene stock?

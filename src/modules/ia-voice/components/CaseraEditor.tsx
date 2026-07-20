@@ -1,14 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { 
   Plus, Trash2, ArrowLeft, ClipboardList, Mic2,
-  Mic, ListChecks, FileSearch, Check, ClipboardCheck
+  Mic, ListChecks, FileSearch, Check, ClipboardCheck, X
 } from 'lucide-react';
+
+import { type ProductoBase } from '@/modules/inventario/repository';
 
 interface CaseraEditorProps {
   updateTarget: any;
   ahijada: any;
+  productosMaestro: ProductoBase[];
   updateStep: string;
   drafts: any[];
   inputText: string;
@@ -17,7 +20,7 @@ interface CaseraEditorProps {
   onSetUpdateStep: (step: string) => void;
   onSetInputText: (text: string) => void;
   onSimulateDictation: () => void;
-  onProcessInputWithAI: () => void;
+  onProcessInputWithAI: (inputType: 'text' | 'audio', content: string, mimeType?: string) => void;
   onUpdateDraftField: (id: string, field: string, value: any) => void;
   onRemoveDraft: (id: string) => void;
   onAddNewEmptyDraft: () => void;
@@ -25,12 +28,64 @@ interface CaseraEditorProps {
 }
 
 export default function CaseraEditor({
-  updateTarget, ahijada, updateStep, drafts, inputText, isDictating,
+  updateTarget, ahijada, productosMaestro, updateStep, drafts, inputText, isDictating,
   onBack, onSetUpdateStep, onSetInputText, onSimulateDictation,
   onProcessInputWithAI, onUpdateDraftField, onRemoveDraft,
   onAddNewEmptyDraft, onConfirmAndSaveDrafts
 }: CaseraEditorProps) {
-  const isAhijada = updateTarget?.id === ahijada.id;
+  const isAhijada = updateTarget?.id === ahijada?.id;
+  const [showInputMethodModal, setShowInputMethodModal] = React.useState(false);
+  
+  // Audio Recording State
+  const [recording, setRecording] = React.useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+
+  const startRecording = async () => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("El navegador bloqueó el acceso al micrófono. Para usar audio en una PWA, debes estar en una conexión segura (HTTPS) o localhost.");
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = () => {
+          const base64Data = reader.result?.toString().split(',')[1];
+          if (base64Data) {
+            onProcessInputWithAI('audio', base64Data, mediaRecorder.mimeType);
+          }
+        };
+        // Detener todas las pistas de audio para liberar el micrófono
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setRecording(true);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      alert("No se pudo acceder al micrófono. Por favor, revisa los permisos del navegador.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && recording) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--bg-maiz)] overflow-hidden z-[100] relative anim-stagger">
@@ -58,9 +113,9 @@ export default function CaseraEditor({
         {updateStep === 'manual' && (
           <div className="p-6 pt-6 anim-stagger">
             
-            {/* Sección Ayuda con IA */}
+            {/* Botón Principal para IA */}
             <div 
-              onClick={() => onSetUpdateStep('ai_input')}
+              onClick={() => setShowInputMethodModal(true)}
               className="bg-gradient-to-r from-[var(--dorado-gamlp)] to-[#9B7A1C] p-5 rounded-2xl shadow-lg mb-8 flex items-center justify-between cursor-pointer hover:shadow-xl active:scale-95 transition-all group"
             >
               <div>
@@ -98,13 +153,39 @@ export default function CaseraEditor({
                       {draft.icono}
                     </div>
                     <div className="flex-1 pt-1">
-                      <input 
-                        type="text" 
-                        value={draft.producto} 
-                        onChange={(e) => onUpdateDraftField(draft.id, 'producto', e.target.value)}
-                        placeholder="Ej: Tomate Perita"
-                        className="font-display font-bold text-lg text-[var(--texto-fuerte)] w-full input-editable p-1 rounded-md"
-                      />
+                      {draft.isNew ? (
+                        <>
+                          <input
+                            list={`productos-maestro-${draft.id}`}
+                            value={draft.producto || ''}
+                            placeholder="Nombre del producto..."
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              onUpdateDraftField(draft.id, 'producto', val);
+                              const selected = productosMaestro.find(p => p.nombre.toLowerCase() === val.toLowerCase());
+                              if (selected) {
+                                onUpdateDraftField(draft.id, 'producto_id', selected.id);
+                                onUpdateDraftField(draft.id, 'icono', selected.icono);
+                              } else {
+                                onUpdateDraftField(draft.id, 'producto_id', '');
+                              }
+                            }}
+                            className="font-display font-bold text-[var(--texto-fuerte)] w-full input-editable p-2 rounded-md bg-white border border-[var(--borde)] text-sm"
+                          />
+                          <datalist id={`productos-maestro-${draft.id}`}>
+                            {productosMaestro.map(pm => (
+                              <option key={pm.id} value={pm.nombre} />
+                            ))}
+                          </datalist>
+                        </>
+                      ) : (
+                        <input 
+                          type="text" 
+                          value={draft.producto} 
+                          disabled
+                          className="font-display font-bold text-lg text-[var(--texto-suave)] w-full bg-transparent p-1 rounded-md"
+                        />
+                      )}
                       <div className="text-[10px] font-bold text-[var(--texto-suave)] uppercase tracking-widest mt-1 ml-1">Producto</div>
                     </div>
                   </div>
@@ -172,8 +253,7 @@ export default function CaseraEditor({
             </button>
           </div>
         )}
-
-        {/* MODO 2: INPUT DE IA (DICTADO) */}
+        {/* MODO 2: INPUT DE IA (TEXTO / DICTADO) */}
         {updateStep === 'ai_input' && (
           <div className="flex flex-col h-full anim-stagger px-6 pt-10">
             <div className="text-center mb-8">
@@ -218,7 +298,7 @@ export default function CaseraEditor({
                 Cancelar
               </button>
               <button 
-                onClick={onProcessInputWithAI}
+                onClick={() => onProcessInputWithAI('text', inputText)}
                 disabled={!inputText.trim()}
                 className="flex-1 py-4 bg-[var(--verde-palta)] text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:bg-gray-300 disabled:shadow-none transition-all hover:bg-[#2E7D32] active:scale-95"
               >
@@ -229,6 +309,45 @@ export default function CaseraEditor({
           </div>
         )}
 
+        {/* MODO 2.5: INPUT DE AUDIO (AYMARA) */}
+        {updateStep === 'audio_input' && (
+          <div className="flex flex-col h-full anim-stagger px-6 pt-10 text-center">
+            <h3 className="font-display font-extrabold text-2xl text-[var(--texto-fuerte)] leading-tight mb-2">
+              Habla con confianza
+            </h3>
+            <p className="text-sm text-[var(--texto-suave)] mb-10 px-4">
+              Toca el botón para empezar a grabar y tócalo de nuevo al terminar. ¡Puedes hablar en Aymara o Castellano!
+            </p>
+            
+            <div className="flex-1 flex flex-col items-center justify-center pb-20">
+              <button 
+                className={`w-40 h-40 rounded-full bg-gradient-to-tr shadow-[0_15px_35px_rgba(76,175,80,0.4)] flex items-center justify-center text-white transition-all relative ${recording ? 'from-[#FF5252] to-[#D32F2F] pulse-ring scale-110' : 'from-[var(--verde-palta)] to-[#2E7D32] active:scale-95'}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (recording) {
+                    stopRecording();
+                  } else {
+                    startRecording();
+                  }
+                }}
+              >
+                <Mic size={64} className="fill-current" />
+                <div className={`absolute -bottom-6 text-[10px] font-bold bg-white px-3 py-1 rounded-full shadow-sm border whitespace-nowrap ${recording ? 'text-[#D32F2F] border-[#FF5252]' : 'text-[var(--verde-palta)] border-[var(--verde-palta)]/20'}`}>
+                  {recording ? 'Escuchando... (Toca para detener)' : 'Toca para hablar'}
+                </div>
+              </button>
+            </div>
+
+            <div className="flex gap-3 mb-6">
+              <button 
+                onClick={() => onSetUpdateStep('manual')}
+                className="w-full py-4 bg-white text-[var(--texto-suave)] rounded-2xl font-bold border border-[var(--borde)] shadow-sm active:scale-95 transition-transform"
+              >
+                Cancelar y Volver
+              </button>
+            </div>
+          </div>
+        )}
         {/* MODO 3: PROCESANDO */}
         {updateStep === 'processing' && (
           <div className="flex flex-col h-full items-center justify-center text-center -mt-10 px-6">
@@ -258,6 +377,68 @@ export default function CaseraEditor({
           >
             <Check size={20}/> Guardar Cambios en mi Puesto
           </button>
+        </div>
+      )}
+      {/* MODAL DE SELECCIÓN DE MÉTODO */}
+      {showInputMethodModal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowInputMethodModal(false)}></div>
+          <div className="bg-white rounded-[2rem] p-6 relative z-10 w-full max-w-sm shadow-2xl animate-[slideUp_0.3s_ease-out]">
+            <button onClick={() => setShowInputMethodModal(false)} className="absolute top-4 right-4 text-gray-400 p-2 hover:bg-gray-100 rounded-full">
+              <X size={20}/>
+            </button>
+            <h3 className="font-display font-bold text-[var(--texto-fuerte)] text-xl mb-6 pr-8">
+              ¿Cómo quieres actualizar hoy?
+            </h3>
+            
+            {/* Canal A */}
+            <div 
+              onClick={() => {
+                setShowInputMethodModal(false);
+                onSetUpdateStep('audio_input');
+              }}
+              className="bg-gradient-to-r from-[var(--verde-palta)] to-[#2E7D32] p-5 rounded-[1.5rem] shadow-md mb-4 flex items-center justify-between cursor-pointer active:scale-95 transition-transform group border border-transparent"
+            >
+              <div className="flex-1 pr-4">
+                <div className="inline-flex items-center gap-1.5 bg-[#1B5E20]/40 text-white text-[9px] font-bold px-2 py-0.5 rounded-full mb-2 uppercase tracking-widest">
+                  ✨ Recomendado para Aymara
+                </div>
+                <h3 className="font-display text-white font-bold text-lg leading-tight">
+                  Enviar Audio
+                </h3>
+                <p className="text-white/80 text-[11px] font-medium mt-1 leading-relaxed">
+                  Solo presiona el micrófono y habla naturalmente.
+                </p>
+              </div>
+              <div className="w-14 h-14 rounded-full bg-white text-[var(--verde-palta)] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shrink-0">
+                <Mic size={26} className="fill-current" />
+              </div>
+            </div>
+
+            {/* Canal B */}
+            <div 
+              onClick={() => {
+                setShowInputMethodModal(false);
+                onSetUpdateStep('ai_input');
+              }}
+              className="bg-white p-5 rounded-[1.5rem] shadow-sm mb-2 flex items-center justify-between cursor-pointer active:scale-95 transition-transform group border-2 border-[var(--dorado-gamlp)]/30 hover:border-[var(--dorado-gamlp)]"
+            >
+              <div className="flex-1 pr-4">
+                <div className="inline-flex items-center gap-1.5 bg-[var(--bg-maiz)] text-[var(--texto-suave)] text-[9px] font-bold px-2 py-0.5 rounded-full mb-2 uppercase tracking-widest border border-[var(--borde)]">
+                  Castellano fluido
+                </div>
+                <h3 className="font-display text-[var(--texto-fuerte)] font-bold text-lg leading-tight">
+                  Escribir o Dictar Texto
+                </h3>
+                <p className="text-[var(--texto-suave)] text-[11px] font-medium mt-1 leading-relaxed">
+                  Revisa el texto mientras dictas o si hay mucho ruido ambiental.
+                </p>
+              </div>
+              <div className="w-14 h-14 rounded-full bg-[var(--bg-maiz)] text-[var(--texto-suave)] border border-[var(--borde)] flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                <ListChecks size={24} />
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

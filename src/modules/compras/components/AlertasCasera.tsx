@@ -6,7 +6,7 @@ import type { AlertaWaze } from '@/modules/compras/waze-alerts';
 
 interface AlertasCaseraProps {
   alertas: AlertaWaze[];
-  onResolverAlerta: (alertaId: string, accion: string, productoId: string | null) => void;
+  onResolverAlerta: (alertaId: string, accion: 'confirmar' | 'ignorar', inventarioId: string, tipo: 'agotado' | 'precio_alto') => void;
 }
 
 export default function AlertasCasera({ alertas, onResolverAlerta }: AlertasCaseraProps) {
@@ -40,22 +40,21 @@ export default function AlertasCasera({ alertas, onResolverAlerta }: AlertasCase
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-[var(--texto-fuerte)] flex items-center gap-1.5">
-                       Reporte Comunitario <span className="bg-yellow-100 text-yellow-800 text-[9px] px-1.5 py-0.5 rounded font-bold">{alerta.reportes} personas</span>
+                       Reporte Comunitario
                     </h4>
                     <p className="text-xs text-[var(--texto-suave)] mt-1.5 leading-relaxed font-medium">
-                      Los compradores informan que el producto <span className="font-bold text-[var(--rojo-carmesi)] text-sm">{alerta.productoNombre}</span> 
-                      {alerta.tipo === 'agotado' ? ' probablemente ya se agotó en tu puesto.' : ` cambió de precio (Sugieren: Bs ${alerta.sugerencia}).`}
+                      Un comprador informa que <span className="font-bold text-[var(--rojo-carmesi)] text-sm">{alerta.productoNombre}</span> 
+                      {alerta.tipo === 'agotado' ? ' probablemente ya se agotó en tu puesto.' : ` cambió de precio.`}
                     </p>
+                    <p className="text-[10px] text-gray-400 mt-1">{alerta.tiempo}</p>
                   </div>
                 </div>
 
                 <div className="flex gap-3 mt-4 pl-14">
-                  {alerta.tipo === 'agotado' && (
-                    <button onClick={() => onResolverAlerta(alerta.id, 'confirmar_agotado', alerta.productoId)} className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold py-3 rounded-xl shadow-sm transition-colors">
-                      Confirmar Agotado
-                    </button>
-                  )}
-                  <button onClick={() => onResolverAlerta(alerta.id, 'ignorar', null)} className="flex-1 bg-gray-50 border border-[var(--borde)] hover:bg-gray-100 text-[var(--texto-suave)] text-xs font-bold py-3 rounded-xl transition-colors shadow-sm">
+                  <button onClick={() => onResolverAlerta(alerta.id, 'confirmar', alerta.inventarioId, alerta.tipo)} className={`flex-1 text-white text-xs font-bold py-3 rounded-xl shadow-sm transition-colors ${alerta.tipo === 'agotado' ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-500 hover:bg-blue-600'}`}>
+                    {alerta.tipo === 'agotado' ? 'Confirmar Agotado' : 'Revisar Precio'}
+                  </button>
+                  <button onClick={() => onResolverAlerta(alerta.id, 'ignorar', alerta.inventarioId, alerta.tipo)} className="flex-1 bg-gray-50 border border-[var(--borde)] hover:bg-gray-100 text-[var(--texto-suave)] text-xs font-bold py-3 rounded-xl transition-colors shadow-sm">
                     Falso (Ignorar)
                   </button>
                 </div>

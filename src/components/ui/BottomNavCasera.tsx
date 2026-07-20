@@ -18,7 +18,7 @@ export default function BottomNavCasera({ activeTab, onTabChange, alertCount }: 
   ];
 
   return (
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl border border-[var(--borde)] rounded-[2rem] flex justify-between items-center px-3 py-2 z-30 shadow-[0_10px_30px_rgba(0,0,0,0.1)] w-[90%] max-w-[340px]">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl border border-[var(--borde)] rounded-[2rem] flex justify-between items-center px-3 py-2 z-50 shadow-[0_10px_30px_rgba(0,0,0,0.1)] w-[90%] max-w-[340px]">
       {tabs.map(tab => {
         const isActive = activeTab === tab.id || (tab.id === 'solidaria' && activeTab === 'inventario_ahijada');
         return (

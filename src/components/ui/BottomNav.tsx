@@ -12,18 +12,26 @@ export default function BottomNav() {
   const { cart } = useCart();
   const { showToast } = useToast();
 
-  const handleProfileClick = () => {
-    if (isLoggedIn) {
-      showToast("Perfil ciudadano activo", "success");
-    } else {
+  const handleProfileClick = (e: React.MouseEvent) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
       setShowLoginModal(true);
+    } else {
+      showToast("Perfil ciudadano activo", "success");
     }
   };
 
+  const navItems = [
+    { href: '/', icon: Home, label: 'Inicio', id: 'home' },
+    { href: '/catalogo', icon: Search, label: 'Catálogo', id: 'catalogo' },
+    { href: '/mapa', icon: MapIcon, label: 'Red', id: 'mapa' },
+    { href: '#', icon: Users, label: 'Perfil', id: 'perfil', onClick: handleProfileClick }
+  ];
+
   return (
     <>
-      {/* Boton Flotante Comunidad (Ruta Inteligente) */}
-      <Link href="/lista" className="fixed bottom-24 right-4 md:right-8 z-50 bg-[var(--rojo-carmesi)] text-[var(--bg-tarjeta)] p-4 rounded-full shadow-2xl border-2 border-[var(--rojo-claro)] flex items-center justify-center font-bold hover:scale-105 transition-transform" style={{animation: 'fadeUp 0.3s ease-out 0.2s both'}}>
+      {/* Boton Flotante Comunidad (Ruta Inteligente) - Elevado para no tapar el nav */}
+      <Link href="/lista" className="fixed bottom-[100px] right-4 md:right-8 z-50 bg-[var(--rojo-carmesi)] text-[var(--bg-tarjeta)] p-4 rounded-full shadow-2xl border-2 border-[var(--rojo-claro)] flex items-center justify-center font-bold hover:scale-105 transition-transform" style={{animation: 'fadeUp 0.3s ease-out 0.2s both'}}>
         <ListTodo size={24} className="md:mr-2"/>
         <span className="text-xs hidden md:inline">Ruta Inteligente</span>
         {cart.length > 0 && (
@@ -33,24 +41,27 @@ export default function BottomNav() {
         )}
       </Link>
 
-      {/* Navegación Inferior */}
-      <div className="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-[var(--borde)] px-6 pt-3 pb-5 flex justify-between items-center z-50 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] md:px-12 lg:px-24">
-        <Link href="/" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/' ? 'text-[var(--rojo-carmesi)]' : 'text-[var(--texto-suave)] hover:text-[var(--dorado-gamlp)]'}`}>
-          <Home size={22} className={pathname === '/' ? 'fill-current' : ''}/>
-          <span className="text-[9px] font-bold tracking-wider">Inicio</span>
-        </Link>
-        <Link href="/catalogo" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/catalogo' ? 'text-[var(--rojo-carmesi)]' : 'text-[var(--texto-suave)] hover:text-[var(--dorado-gamlp)]'}`}>
-          <Search size={22} />
-          <span className="text-[9px] font-bold tracking-wider">Catálogo</span>
-        </Link>
-        <Link href="/mapa" className={`flex flex-col items-center gap-1 transition-colors ${pathname === '/mapa' ? 'text-[var(--rojo-carmesi)]' : 'text-[var(--texto-suave)] hover:text-[var(--dorado-gamlp)]'}`}>
-          <MapIcon size={22} />
-          <span className="text-[9px] font-bold tracking-wider">Red</span>
-        </Link>
-        <button onClick={handleProfileClick} className={`flex flex-col items-center gap-1 transition-colors ${isLoggedIn ? 'text-[var(--verde-palta)]' : 'text-[var(--texto-suave)] hover:text-[var(--dorado-gamlp)]'}`}>
-          <Users size={22} className={isLoggedIn ? 'fill-current' : ''}/>
-          <span className="text-[9px] font-bold tracking-wider">Perfil</span>
-        </button>
+      {/* Navegación Inferior Estilo Casera (Píldora Flotante) */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-xl border border-[var(--borde)] rounded-[2rem] flex justify-between items-center px-3 py-2 z-50 shadow-[0_10px_30px_rgba(0,0,0,0.1)] w-[90%] max-w-[340px]">
+        {navItems.map(tab => {
+          const isActive = pathname === tab.href || (tab.id === 'perfil' && isLoggedIn);
+          
+          return (
+            <Link 
+              key={tab.id}
+              href={tab.href}
+              onClick={tab.onClick}
+              className={`flex flex-col items-center justify-center h-14 w-[70px] rounded-2xl transition-all duration-300 relative
+                ${isActive ? 'bg-[var(--bg-maiz)] text-[var(--rojo-carmesi)] shadow-inner' : 'text-[var(--texto-suave)] hover:bg-gray-50'}
+              `}
+            >
+              <div className="relative">
+                <tab.icon size={22} strokeWidth={isActive ? 2.5 : 2} className={`transition-transform duration-300 ${isActive ? 'scale-110' : ''}`} />
+              </div>
+              {isActive && <span className="text-[9px] font-bold mt-1 tracking-wide">{tab.label}</span>}
+            </Link>
+          )
+        })}
       </div>
     </>
   );

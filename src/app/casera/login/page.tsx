@@ -7,6 +7,8 @@ import {
   Store, ShieldCheck, UserPlus, MapPin, 
   ChevronRight, Check, Lock, Phone, LogIn, Info, AlertTriangle 
 } from 'lucide-react';
+import { getCaseraById } from '@/modules/inventario/repository';
+import { getMercadoById } from '@/modules/mercados/repository';
 
 const organicMarketStyles = `
   .hide-scroll::-webkit-scrollbar { display: none; }
@@ -43,25 +45,55 @@ export default function LoginPage() {
     setTimeout(() => setToast({ show: false, msg: '', type: 'info' }), 3000);
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if(!authForm.phone || !authForm.pin) {
        showToast("Por favor ingrese su celular y su PIN secreto", "warning");
        return;
     }
-    // TODO: Validate against DB
-    const fakeProfile = {
-      id: 'USR-MARIA-45',
-      nombre: 'Doña María',
-      puesto: 'N° 45 - Sector Verduras',
-      mercado: 'Mercado Rodríguez',
-      calificacion: 4.9,
-      es_madrina: true,
-      progreso_patente: 85
-    };
-    login(fakeProfile, 'casera');
-    showToast("¡Bienvenida a su puesto digital!", "success");
-    router.push('/perfil'); // or wherever Casera home is
+    
+    setIsLoggingIn(true);
+
+    try {
+      // Mapeo temporal para la Demo Hackatón
+      let uuid = null;
+      if (authForm.phone === '70000000') {
+        uuid = 'c2000000-0000-0000-0000-000000000002'; // Doña Rosita
+      } else if (authForm.phone === '71111111') {
+        uuid = 'c1000000-0000-0000-0000-000000000001'; // Doña Flora
+      } else {
+        // Fallback genérico a Doña Flora si escriben otra cosa pero tienen PIN
+        uuid = 'c1000000-0000-0000-0000-000000000001';
+      }
+      
+      const casera = await getCaseraById(uuid);
+      if (!casera) {
+        showToast("No se encontró su puesto, por favor cree uno nuevo.", "error");
+        setIsLoggingIn(false);
+        return;
+      }
+
+      const mercado = await getMercadoById(casera.mercado_id);
+
+      const realProfile = {
+        id: casera.id,
+        nombre: casera.nombre,
+        puesto: `N° ${casera.puesto}`,
+        mercado: mercado?.nombre || 'Mercado No Asignado',
+        calificacion: casera.calificacion,
+        es_madrina: casera.madrina_de ? true : false, // TODO: refine madrina logic if needed
+        progreso_patente: 85 // Faked for now since it's not in DB
+      };
+      
+      login(realProfile, 'casera');
+      showToast("¡Bienvenida a su puesto digital!", "success");
+      router.push('/casera/perfil');
+    } catch (err) {
+      showToast("Error al conectar con la Intendencia", "error");
+      setIsLoggingIn(false);
+    }
   };
 
   const handleNextStep = () => {
@@ -91,7 +123,7 @@ export default function LoginPage() {
     };
     login(newProfile, 'casera');
     showToast(`¡Bienvenida ${authForm.nombre}, su puesto fue creado!`, "success");
-    router.push('/perfil');
+    router.push('/casera/perfil');
   };
 
   const ToastNotificacion = () => {
@@ -154,8 +186,8 @@ export default function LoginPage() {
               </div>
 
               <div className="mt-auto pt-6 pb-4">
-                <button type="submit" className="w-full py-4 bg-gradient-to-r from-[var(--verde-palta)] to-[#2E7D32] text-white rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 hover:shadow-xl active:scale-95 transition-all">
-                  <LogIn size={20}/> Ingresar a mi Puesto
+                <button type="submit" disabled={isLoggingIn} className="w-full py-4 bg-gradient-to-r from-[var(--verde-palta)] to-[#2E7D32] text-white rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 hover:shadow-xl active:scale-95 transition-all disabled:opacity-70 disabled:cursor-wait">
+                  {isLoggingIn ? <span className="animate-pulse">Ingresando...</span> : <><LogIn size={20}/> Ingresar a mi Puesto</>}
                 </button>
               </div>
            </form>
