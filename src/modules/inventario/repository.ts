@@ -1,5 +1,5 @@
 // src/modules/inventario/repository.ts
-// Este archivo está preparado para conectarse a Supabase de manera fácil.
+import { supabase } from '@/lib/supabase';
 
 export interface Producto {
   id: string;
@@ -98,34 +98,104 @@ export const bdCategorias = [
 ];
 
 export async function getCaseraById(id: string): Promise<any> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ ...ahijadaInicial, mercado_id: '11111111-1111-1111-1111-111111111111' });
-    }, 500);
-  });
+  const { data, error } = await supabase
+    .from('caseras')
+    .select('*')
+    .eq('id', id)
+    .single();
+    
+  if (error || !data) {
+    console.error('Error fetching casera:', error);
+    return null;
+  }
+  
+  // Si no tiene metodos_pago por alguna razon (ej: datos viejos), ponemos un default
+  if (!data.metodos_pago) {
+    data.metodos_pago = ['Efectivo'];
+  }
+  
+  return data;
 }
 
+const ofertasIniciales = [
+  {
+    id: 'o1',
+    precio: 55.00,
+    unidad: 'arroba',
+    prod: { nombre: 'Papa Imilla', icono: '🥔', categoria: 'Tubérculos' },
+    casera: { id: 'c1', nombre: 'Doña Rosita', calificacion: 4.8 }
+  },
+  {
+    id: 'o2',
+    precio: 5.00,
+    unidad: 'cuarta',
+    prod: { nombre: 'Tomate Perita', icono: '🍅', categoria: 'Verduras' },
+    casera: { id: 'c1', nombre: 'Doña Rosita', calificacion: 4.8 }
+  },
+  {
+    id: 'o3',
+    precio: 12.00,
+    unidad: 'docena',
+    prod: { nombre: 'Choclo Tierno', icono: '🌽', categoria: 'Verduras' },
+    casera: { id: 'c2', nombre: 'Doña Carmen', calificacion: 4.5 }
+  },
+  {
+    id: 'o4',
+    precio: 3.00,
+    unidad: 'cuartilla',
+    prod: { nombre: 'Zanahoria', icono: '🥕', categoria: 'Verduras' },
+    casera: { id: 'c2', nombre: 'Doña Carmen', calificacion: 4.5 }
+  }
+];
+
 export async function getCatalogoOfertas(): Promise<any[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...inventarioInicial]);
-    }, 500);
-  });
+  const { data, error } = await supabase
+    .from('ofertas')
+    .select('*, productos(*), caseras(*, mercados(*))');
+
+  if (error) {
+    console.error('Error fetching ofertas:', error);
+    return [];
+  }
+
+  // Mapeamos para que coincida con lo que espera el Frontend
+  return (data || []).map(o => ({
+    ...o,
+    prod: o.productos,
+    casera: o.caseras,
+    mercado: o.caseras?.mercados
+  }));
 }
 
 export async function getCaserasPorMercado(mercadoId: string): Promise<any[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([ahijadaInicial]);
-    }, 500);
-  });
+  const { data, error } = await supabase
+    .from('caseras')
+    .select('*')
+    .eq('mercado_id', mercadoId);
+
+  if (error) {
+    console.error('Error fetching caseras:', error);
+    return [];
+  }
+
+  return data || [];
 }
 
 export async function getInventarioByCasera(caseraId: string): Promise<any[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([...inventarioInicial]);
-    }, 500);
-  });
+  const { data, error } = await supabase
+    .from('ofertas')
+    .select('*, productos(*)')
+    .eq('casera_id', caseraId);
+
+  if (error) {
+    console.error('Error fetching inventario casera:', error);
+    return [];
+  }
+
+  // Mapeamos el producto_id a producto para que el frontend lo lea
+  return (data || []).map(o => ({
+    ...o,
+    producto: o.productos
+  }));
 }
 

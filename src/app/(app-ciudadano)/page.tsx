@@ -18,7 +18,7 @@ export default function HomePage() {
     async function loadData() {
       const mercs = await getMercados();
       setMercados(mercs);
-      const casera = await getCaseraById('c2');
+      const casera = await getCaseraById('c2222222-2222-2222-2222-222222222222');
       setCaseraMadrina(casera);
     }
     loadData();
@@ -79,7 +79,7 @@ export default function HomePage() {
         </div>
 
         {/* Casera de la semana (Madrina Flow) */}
-        {caseraMadrina && (
+        {caseraMadrina ? (
           <Link href={`/casera/${caseraMadrina.id}`} className="block">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -111,6 +111,10 @@ export default function HomePage() {
               </div>
             </div>
           </Link>
+        ) : (
+          <div className="p-4 bg-yellow-50 text-yellow-800 rounded-xl text-xs">
+            ¡Por favor, corre el script SQL actualizado en Supabase para ver a las caseras!
+          </div>
         )}
 
         {/* Mercados Cercanos */}

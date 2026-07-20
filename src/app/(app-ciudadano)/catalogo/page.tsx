@@ -14,6 +14,7 @@ function CatalogoContent() {
 
   const [listaOfertas, setListaOfertas] = useState<any[]>([]);
   const [filtroCategoria, setFiltroCategoria] = useState(initCategoria);
+  const [filtroMercado, setFiltroMercado] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('recomendado');
   const [showFilters, setShowFilters] = useState(false);
@@ -43,17 +44,26 @@ function CatalogoContent() {
   let filtered = listaOfertas;
   if (filtroCategoria !== 'cat_todas') {
     const cat = bdCategorias.find(c => c.id === filtroCategoria);
-    if (cat) filtered = filtered.filter(o => o.prod.categoria === cat.nombre);
+    if (cat) filtered = filtered.filter(o => o.prod?.categoria === cat.nombre);
+  }
+
+  if (filtroMercado !== 'todos') {
+    filtered = filtered.filter(o => o.mercado?.id === filtroMercado);
   }
 
   if (searchQuery.trim()) {
     const q = searchQuery.toLowerCase();
     filtered = filtered.filter(o => 
-      o.prod.nombre.toLowerCase().includes(q) || 
-      o.prod.categoria.toLowerCase().includes(q) ||
-      o.casera.nombre.toLowerCase().includes(q)
+      o.prod?.nombre.toLowerCase().includes(q) || 
+      o.prod?.categoria.toLowerCase().includes(q) ||
+      o.casera?.nombre.toLowerCase().includes(q) ||
+      o.mercado?.nombre.toLowerCase().includes(q)
     );
   }
+
+  const mercadosUnicos = Array.from(new Set(listaOfertas.map(o => o.mercado?.id)))
+    .map(id => listaOfertas.find(o => o.mercado?.id === id)?.mercado)
+    .filter(Boolean);
 
   const sorted = [...filtered].sort((a, b) => {
     if (sortBy === 'precio_asc') return a.precio - b.precio;
@@ -93,7 +103,20 @@ function CatalogoContent() {
 
         {/* Filtros */}
         {showFilters && (
-          <div className="mb-4 bg-[var(--bg-tarjeta)] p-3.5 rounded-xl border border-[var(--dorado-gamlp)]/30 shadow-md anim-stagger">
+          <div className="mb-4 bg-[var(--bg-tarjeta)] p-3.5 rounded-xl border border-[var(--dorado-gamlp)]/30 shadow-md anim-stagger space-y-3">
+            <div className="flex items-center gap-2">
+              <Store size={16} className="text-[var(--texto-suave)]"/>
+              <select 
+                value={filtroMercado}
+                onChange={(e) => setFiltroMercado(e.target.value)}
+                className="flex-1 bg-gray-50 border border-[var(--borde)] rounded-lg px-2 py-1.5 text-xs text-[var(--texto-fuerte)] outline-none focus:border-[var(--rojo-carmesi)]"
+              >
+                <option value="todos">Todos los mercados</option>
+                {mercadosUnicos.map((m: any) => (
+                  <option key={m.id} value={m.id}>{m.nombre}</option>
+                ))}
+              </select>
+            </div>
             <div className="flex flex-wrap gap-2 text-xs font-bold">
               <button onClick={() => setSortBy('recomendado')} className={`px-3 py-2 rounded-lg border ${sortBy === 'recomendado' ? 'bg-[var(--texto-fuerte)] text-[var(--bg-tarjeta)]' : 'bg-transparent text-[var(--texto-suave)]'}`}>📍 Recomendados</button>
               <button onClick={() => setSortBy('precio_asc')} className={`px-3 py-2 rounded-lg border ${sortBy === 'precio_asc' ? 'bg-[var(--verde-claro)] border-[var(--verde-palta)] text-[var(--verde-palta)]' : 'bg-transparent text-[var(--texto-suave)]'}`}>Menor Precio</button>
@@ -140,12 +163,15 @@ function CatalogoContent() {
                     </div>
                   </div>
                   
-                  <Link href={`/casera/${oferta.casera.id}`} className="block mt-1 bg-white px-2 py-1.5 rounded-lg border border-[var(--borde)]">
-                    <p className="text-[11px] font-bold text-[var(--texto-fuerte)] flex items-center gap-1">
-                      {oferta.casera.nombre} 
+                  <Link href={`/casera/${oferta.casera?.id}`} className="block mt-1 bg-white px-2 py-1.5 rounded-lg border border-[var(--borde)] hover:border-[var(--rojo-carmesi)] transition-colors">
+                    <p className="text-[11px] font-bold text-[var(--texto-fuerte)] flex items-center justify-between gap-1">
+                      <span>{oferta.casera?.nombre}</span>
                       <span className="text-[9px] flex items-center bg-[var(--dorado-claro)] text-[var(--dorado-gamlp)] px-1 rounded">
-                         <Star size={8} fill="currentColor" className="mr-0.5"/> {oferta.casera.calificacion}
+                         <Star size={8} fill="currentColor" className="mr-0.5"/> {oferta.casera?.calificacion}
                       </span>
+                    </p>
+                    <p className="text-[9px] text-[var(--texto-suave)] mt-0.5 flex items-center gap-1">
+                      <Store size={10} /> {oferta.mercado?.nombre}
                     </p>
                   </Link>
                 </div>
