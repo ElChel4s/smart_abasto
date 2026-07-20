@@ -22,16 +22,16 @@ export default function BottomNav() {
   };
 
   const navItems = [
-    { href: '/', icon: Home, label: 'Inicio', id: 'home' },
-    { href: '/catalogo', icon: Search, label: 'Catálogo', id: 'catalogo' },
-    { href: '/mapa', icon: MapIcon, label: 'Red', id: 'mapa' },
+    { href: '/ciudadano', icon: Home, label: 'Inicio', id: 'home' },
+    { href: '/ciudadano/catalogo', icon: Search, label: 'Catálogo', id: 'catalogo' },
+    { href: '/ciudadano/mapa', icon: MapIcon, label: 'Red', id: 'mapa' },
     { href: '#', icon: Users, label: 'Perfil', id: 'perfil', onClick: handleProfileClick }
   ];
 
   return (
     <>
       {/* Boton Flotante Comunidad (Ruta Inteligente) - Elevado para no tapar el nav */}
-      <Link href="/lista" className="fixed bottom-[100px] right-4 md:right-8 z-50 bg-[var(--rojo-carmesi)] text-[var(--bg-tarjeta)] p-4 rounded-full shadow-2xl border-2 border-[var(--rojo-claro)] flex items-center justify-center font-bold hover:scale-105 transition-transform" style={{animation: 'fadeUp 0.3s ease-out 0.2s both'}}>
+      <Link href="/ciudadano/lista" className="fixed bottom-[100px] right-4 md:right-8 z-50 bg-[var(--rojo-carmesi)] text-[var(--bg-tarjeta)] p-4 rounded-full shadow-2xl border-2 border-[var(--rojo-claro)] flex items-center justify-center font-bold hover:scale-105 transition-transform" style={{animation: 'fadeUp 0.3s ease-out 0.2s both'}}>
         <ListTodo size={24} className="md:mr-2"/>
         <span className="text-xs hidden md:inline">Ruta Inteligente</span>
         {cart.length > 0 && (

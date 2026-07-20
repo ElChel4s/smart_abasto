@@ -77,7 +77,7 @@ export default function MapaPage() {
               subtitle: m.calificacion.toString(),
               icon: m.img
             }))}
-            onMarkerClick={(id) => router.push(`/mercado/${id}`)}
+            onMarkerClick={(id) => router.push(`/ciudadano/mercado/${id}`)}
           />
         </div>
       )}
@@ -120,7 +120,7 @@ export default function MapaPage() {
           {/* Listado */}
           <div className="space-y-4 flex-1">
             {sortedMercados.map((m) => (
-              <Link href={`/mercado/${m.id}`} key={m.id} className="block card-organic interactive p-4 bg-[var(--bg-tarjeta)] cursor-pointer">
+              <Link href={`/ciudadano/mercado/${m.id}`} key={m.id} className="block card-organic interactive p-4 bg-[var(--bg-tarjeta)] cursor-pointer">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 bg-[var(--bg-maiz)] rounded-2xl flex items-center justify-center text-3xl border border-[var(--borde)] shadow-sm shrink-0">
                     {m.img}

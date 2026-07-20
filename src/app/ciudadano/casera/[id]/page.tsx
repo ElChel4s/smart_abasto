@@ -169,7 +169,7 @@ export default function CaseraDetail() {
       
       {/* Cabecera Casera */}
       <div className="pattern-rafia px-6 pt-12 pb-6 relative shadow-sm border-b border-[var(--dorado-gamlp)]/30 shrink-0">
-        <Link href={`/mercado/${market.id}`} className="w-10 h-10 flex items-center justify-center bg-[var(--bg-tarjeta)] rounded-full mb-6 border border-[var(--borde)] hover:bg-white transition-colors">
+        <Link href={`/ciudadano/mercado/${market.id}`} className="w-10 h-10 flex items-center justify-center bg-[var(--bg-tarjeta)] rounded-full mb-6 border border-[var(--borde)] hover:bg-white transition-colors">
           <ChevronLeft size={22} className="text-[var(--texto-fuerte)]" />
         </Link>
         

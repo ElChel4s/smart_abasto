@@ -61,11 +61,11 @@ export default function HomePage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-bold text-[var(--texto-fuerte)] uppercase tracking-widest">Explorar Catálogo</h2>
-            <Link href="/catalogo" className="text-[10px] font-bold text-[var(--dorado-gamlp)] hover:underline flex items-center gap-1">Ver todo <ArrowRight size={10}/></Link>
+            <Link href="/ciudadano/catalogo" className="text-[10px] font-bold text-[var(--dorado-gamlp)] hover:underline flex items-center gap-1">Ver todo <ArrowRight size={10}/></Link>
           </div>
           <div className="grid grid-cols-4 gap-3">
             {bdCategorias.filter(c => c.id !== 'cat_todas').map(cat => (
-              <Link href={`/catalogo?categoria=${cat.id}`} key={cat.id} className="flex flex-col items-center gap-1.5 cursor-pointer group">
+              <Link href={`/ciudadano/catalogo?categoria=${cat.id}`} key={cat.id} className="flex flex-col items-center gap-1.5 cursor-pointer group">
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-sm border border-[var(--borde)] transition-transform group-hover:-translate-y-1 group-active:scale-95" style={{ backgroundColor: cat.bg }}>
                   {cat.icono}
                 </div>
@@ -77,7 +77,7 @@ export default function HomePage() {
 
         {/* Casera de la semana (Madrina Flow) */}
         {caseraMadrina && (
-          <Link href={`/casera/${caseraMadrina.id}`} className="block cursor-pointer">
+          <Link href={`/ciudadano/casera/${caseraMadrina.id}`} className="block cursor-pointer">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <HandHeart size={18} className="text-[var(--rojo-carmesi)]" />
@@ -114,13 +114,13 @@ export default function HomePage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xs font-bold text-[var(--texto-fuerte)] uppercase tracking-widest">Mercados Cercanos</h2>
-            <Link href="/mapa" className="text-[10px] font-bold text-[var(--dorado-gamlp)] flex items-center gap-1 hover:underline bg-[var(--dorado-claro)] px-2 py-1 rounded-md border border-[var(--dorado-gamlp)]/30">
+            <Link href="/ciudadano/mapa" className="text-[10px] font-bold text-[var(--dorado-gamlp)] flex items-center gap-1 hover:underline bg-[var(--dorado-claro)] px-2 py-1 rounded-md border border-[var(--dorado-gamlp)]/30">
               Ver mapa <ArrowRight size={10}/>
             </Link>
           </div>
           <div className="space-y-3">
             {mercados.slice(0, 2).map(m => (
-              <Link href={`/mercado/${m.id}`} key={m.id} className="card-organic interactive p-4 cursor-pointer flex items-center gap-4 bg-[var(--bg-tarjeta)]">
+              <Link href={`/ciudadano/mercado/${m.id}`} key={m.id} className="card-organic interactive p-4 cursor-pointer flex items-center gap-4 bg-[var(--bg-tarjeta)]">
                 <div className="text-3xl w-12 h-12 bg-[var(--bg-maiz)] rounded-xl flex items-center justify-center border border-[var(--borde)]">
                   {m.img}
                 </div>

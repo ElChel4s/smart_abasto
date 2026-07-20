@@ -10,7 +10,7 @@ import NameSetupModal from '@/components/ui/NameSetupModal';
 import BottomNav from '@/components/ui/BottomNav';
 import { organicMarketStyles } from '@/components/ui/organicMarketStyles';
 
-export default function CiudadanoLayout({ children }: { children: ReactNode }) {
+export default function CiudadanoProviders({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
       <ToastProvider>

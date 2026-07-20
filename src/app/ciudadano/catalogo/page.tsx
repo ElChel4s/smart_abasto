@@ -150,7 +150,7 @@ function CatalogoContent() {
                     </div>
                   </div>
                   
-                  <Link href={`/casera/${oferta.casera?.id}`} className="cursor-pointer group mt-1 bg-white px-2 py-1.5 rounded-lg border border-[var(--borde)] block">
+                  <Link href={`/ciudadano/casera/${oferta.casera?.id}`} className="cursor-pointer group mt-1 bg-white px-2 py-1.5 rounded-lg border border-[var(--borde)] block">
                     <p className="text-[11px] font-bold text-[var(--texto-fuerte)] flex items-center gap-1 group-hover:text-[var(--dorado-gamlp)] transition-colors">
                       {oferta.casera?.nombre} 
                       <span className="text-[9px] flex items-center bg-[var(--dorado-claro)] text-[var(--dorado-gamlp)] px-1 rounded">

@@ -67,7 +67,7 @@ export default function ListaPage() {
     <div className="flex-1 flex flex-col bg-[var(--bg-maiz)] overflow-y-auto hide-scroll pb-28 anim-stagger">
       {/* Cabecera */}
       <div className="pattern-rafia px-6 pt-12 pb-6 relative shadow-sm border-b border-[var(--dorado-gamlp)]/30 shrink-0">
-        <Link href="/" className="w-10 h-10 flex items-center justify-center bg-[var(--bg-tarjeta)] rounded-full mb-4 border border-[var(--borde)] hover:bg-white transition-colors">
+        <Link href="/ciudadano" className="w-10 h-10 flex items-center justify-center bg-[var(--bg-tarjeta)] rounded-full mb-4 border border-[var(--borde)] hover:bg-white transition-colors">
           <ChevronLeft size={22} className="text-[var(--texto-fuerte)]" />
         </Link>
         <h1 className="font-display text-2xl font-bold text-[var(--texto-fuerte)] flex items-center gap-2">
@@ -82,7 +82,7 @@ export default function ListaPage() {
             <span className="text-4xl block mb-3">🛒</span>
             <h3 className="font-bold text-[var(--texto-fuerte)]">Tu lista está vacía</h3>
             <p className="text-xs text-[var(--texto-suave)] mt-1">Explora el catálogo y añade productos para armar tu ruta de compras.</p>
-            <Link href="/catalogo" className="mt-4 inline-block bg-[var(--rojo-carmesi)] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md hover:bg-red-800 transition-colors">
+            <Link href="/ciudadano/catalogo" className="mt-4 inline-block bg-[var(--rojo-carmesi)] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md hover:bg-red-800 transition-colors">
               Ir al Catálogo
             </Link>
           </div>

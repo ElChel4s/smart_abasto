@@ -79,7 +79,7 @@ export default function MercadoDetail() {
   return (
     <div className="flex-1 flex flex-col bg-[var(--bg-maiz)] overflow-y-auto hide-scroll pb-28 anim-stagger">
       <div className="pattern-rafia px-6 pt-12 pb-6 relative shadow-sm border-b border-[var(--dorado-gamlp)]/30 shrink-0">
-        <Link href="/" className="w-10 h-10 flex items-center justify-center bg-[var(--bg-tarjeta)]/90 backdrop-blur rounded-full mb-4 shadow-sm hover:bg-white transition-colors border border-[var(--borde)]">
+        <Link href="/ciudadano" className="w-10 h-10 flex items-center justify-center bg-[var(--bg-tarjeta)]/90 backdrop-blur rounded-full mb-4 shadow-sm hover:bg-white transition-colors border border-[var(--borde)]">
           <ChevronLeft size={22} className="text-[var(--texto-fuerte)]" />
         </Link>
         <div className="flex items-center gap-4 mb-4">
@@ -169,7 +169,7 @@ export default function MercadoDetail() {
 
             <div className="space-y-4">
               {caseras.map((casera) => (
-                <Link href={`/casera/${casera.id}`} key={casera.id} className="block card-organic interactive p-4 cursor-pointer relative overflow-hidden bg-[var(--bg-tarjeta)]">
+                <Link href={`/ciudadano/casera/${casera.id}`} key={casera.id} className="block card-organic interactive p-4 cursor-pointer relative overflow-hidden bg-[var(--bg-tarjeta)]">
                   <div className="flex items-center gap-4 relative z-10">
                     <div className="w-12 h-12 bg-[var(--dorado-claro)] rounded-full flex items-center justify-center font-display text-xl text-[var(--dorado-gamlp)] font-bold border border-[var(--dorado-gamlp)]/30 shrink-0">
                       {casera.nombre.charAt(0)}

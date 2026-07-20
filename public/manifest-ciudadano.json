@@ -1,0 +1,23 @@
+{
+  "name": "Portal de Abasto - Ciudadano",
+  "short_name": "Abasto Ciudadano",
+  "description": "Busca precios justos, mercados abiertos y exige Peso Fiel en La Paz.",
+  "start_url": "/ciudadano",
+  "scope": "/ciudadano/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDFBF7",
+  "theme_color": "#388E3C",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/notionists/png?seed=AbastoCiudadano&backgroundColor=388e3c",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/notionists/png?seed=AbastoCiudadano&backgroundColor=388e3c",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

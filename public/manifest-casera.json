@@ -1,0 +1,23 @@
+{
+  "name": "Portal de Abasto - Caseras",
+  "short_name": "Abasto Caseras",
+  "description": "Actualiza tu inventario por voz con IA y conecta con tus clientes.",
+  "start_url": "/casera/perfil",
+  "scope": "/casera/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FDFBF7",
+  "theme_color": "#D32F2F",
+  "icons": [
+    {
+      "src": "https://api.dicebear.com/7.x/notionists/png?seed=AbastoCaseras&backgroundColor=d32f2f",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://api.dicebear.com/7.x/notionists/png?seed=AbastoCaseras&backgroundColor=d32f2f",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
