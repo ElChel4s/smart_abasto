@@ -1,26 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;500;700&display=swap');
+
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --bg-maiz: #FDFBF7; 
+  --bg-tarjeta: #FFFFFF; 
+  
+  --rojo-carmesi: #D32F2F; 
+  --rojo-claro: #FFEBEE;
+  
+  --verde-palta: #388E3C; 
+  --verde-claro: #E8F5E9;
+  
+  --dorado-gamlp: #D4AF37; 
+  --dorado-claro: #FFF5D1;
+  
+  --texto-fuerte: #2D2422; 
+  --texto-suave: #796661;
+  --borde: #EADBCE;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #1D3B27; 
+  font-family: 'DM Sans', sans-serif;
+  color: var(--texto-fuerte);
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+  padding: 0;
+}
+
+.font-display { 
+  font-family: 'Bricolage Grotesque', sans-serif; 
+  letter-spacing: -0.02em;
+}
+
+/* Animaciones */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scan {
+  0% { top: -10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
+
+@keyframes pulseRipples {
+  0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(212, 175, 55, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+.anim-stagger > * {
+  opacity: 0;
+  animation: fadeUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.anim-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.anim-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.anim-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.anim-stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.anim-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+
+.mic-listening { animation: pulseRipples 1.5s infinite; }
+
+/* Patrón de Bolsa de Rafia */
+.pattern-rafia {
+  background-color: var(--bg-maiz);
+  background-image: 
+    linear-gradient(90deg, rgba(211,47,47,0.04) 0px, rgba(211,47,47,0.04) 4px, transparent 4px, transparent 12px, rgba(56,142,60,0.03) 12px, rgba(56,142,60,0.03) 24px, transparent 24px, transparent 28px, rgba(212,175,55,0.05) 28px, rgba(212,175,55,0.05) 32px, transparent 32px, transparent 40px),
+    repeating-linear-gradient(0deg, transparent, transparent 10px, rgba(0,0,0,0.015) 10px, rgba(0,0,0,0.015) 12px);
+  background-size: 40px 100%, 100% 24px;
+}
+
+.card-organic {
+  background: #FFFEFC;
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px -12px rgba(139, 115, 85, 0.15);
+}
+
+.hide-scroll::-webkit-scrollbar { display: none; }
+.hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+.input-editable {
+  border-bottom: 2px dashed var(--borde);
+  transition: all 0.2s;
+  background: transparent;
+}
+.input-editable:focus {
+  border-bottom: 2px solid var(--verde-palta);
+  outline: none;
+  background: var(--verde-claro);
+}
+
+.ticket-edge {
+  background: radial-gradient(circle, transparent 5px, var(--bg-maiz) 5.5px) repeat-x;
+  background-size: 14px 12px;
+  height: 12px;
+}
+  
+/* Estilo para las pestañas de navegación interna (Tabs) */
+.tab-slider-bg {
+  background: var(--borde);
+  border-radius: 12px;
+  position: relative;
+  padding: 4px;
+  display: flex;
 }
