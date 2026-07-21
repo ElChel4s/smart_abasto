@@ -161,14 +161,26 @@ export default function LoginPage() {
          {/* Pestañas de Login / Registro */}
          {(authMode === 'login' || (authMode === 'register' && registerStep === 1)) && (
            <div className="flex bg-gray-100 rounded-2xl p-1 mb-8">
-             <button onClick={() => { setAuthMode('login'); setRegisterStep(1); }} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all \${authMode === 'login' ? 'bg-white text-[var(--verde-palta)] shadow-sm' : 'text-gray-400'}`}>Ya tengo Puesto</button>
-             <button onClick={() => setAuthMode('register')} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all \${authMode === 'register' ? 'bg-white text-[var(--verde-palta)] shadow-sm' : 'text-gray-400'}`}>Soy Nueva</button>
+             <button onClick={() => { setAuthMode('login'); setRegisterStep(1); }} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${authMode === 'login' ? 'bg-white text-[var(--verde-palta)] shadow-sm' : 'text-gray-400'}`}>Ya tengo Puesto</button>
+             <button onClick={() => setAuthMode('register')} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${authMode === 'register' ? 'bg-white text-[var(--verde-palta)] shadow-sm' : 'text-gray-400'}`}>Soy Nueva</button>
            </div>
          )}
 
          {/* --- MODO INGRESO --- */}
          {authMode === 'login' && (
            <form onSubmit={handleLoginSubmit} className="flex-1 flex flex-col space-y-4 anim-stagger">
+              <div 
+                 onClick={() => setAuthForm({ ...authForm, phone: '71111111', pin: '1234' })}
+                 className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3 text-amber-800 text-xs font-medium cursor-pointer hover:bg-amber-100/70 transition-colors select-none mb-2"
+               >
+                 <Info size={16} className="shrink-0 mt-0.5 text-amber-600" />
+                 <div>
+                   <span className="font-bold text-amber-900">¿Probando la demo?</span><br/>
+                   Toca aquí para autocompletar con la Casera de prueba:<br/>
+                   <span className="underline font-bold">Celular: 71111111 | PIN: 1234</span>
+                 </div>
+               </div>
+
               <div>
                 <label className="text-[10px] font-bold text-[var(--texto-suave)] uppercase tracking-widest ml-2 block mb-1">Número de Celular</label>
                 <div className="relative">
