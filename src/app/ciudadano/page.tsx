@@ -1,11 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { ShieldCheck, Users, ArrowRight, HandHeart, Store, Star, Navigation, Clock, ChevronLeft } from 'lucide-react';
 import { getMercados } from '@/modules/mercados/repository';
 import { getCaseraById, bdCategorias } from '@/modules/inventario/repository';
 import { useAuth } from '@/shared/context/AuthContext';
 import { useToast } from '@/shared/context/ToastContext';
+import InstallBanner from '@/components/ui/InstallBanner';
 
 export default function HomePage() {
   const { isLoggedIn, setShowLoginModal } = useAuth();
@@ -25,6 +26,7 @@ export default function HomePage() {
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--bg-maiz)] overflow-y-auto hide-scroll pb-28">
+      <Suspense fallback={null}><InstallBanner /></Suspense>
       
       {/* Header con Patrón de Rafia Boliviana */}
       <div className="px-6 pt-12 pb-8 relative z-10 pattern-rafia border-b border-[var(--dorado-gamlp)]/30 rounded-b-3xl shadow-sm">

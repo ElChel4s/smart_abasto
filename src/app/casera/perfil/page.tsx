@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useAuth } from '@/shared/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
@@ -20,6 +20,7 @@ import CaseraInventario from '@/modules/inventario/components/CaseraInventario';
 import MadrinaView from '@/modules/inventario/components/MadrinaView';
 import AlertasCasera from '@/modules/compras/components/AlertasCasera';
 import CaseraEditor from '@/modules/ia-voice/components/CaseraEditor';
+import InstallBanner from '@/components/ui/InstallBanner';
 
 
 /**
@@ -366,6 +367,7 @@ export default function CaseraDashboard() {
       <ToastNotificacion toast={toast} />
 
       <div className="flex-1 flex flex-col relative overflow-hidden h-screen">
+        <Suspense fallback={null}><InstallBanner /></Suspense>
         {activeTab === 'home' && (
           <CaseraHome 
             miPerfil={miPerfil} 

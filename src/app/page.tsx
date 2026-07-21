@@ -72,8 +72,14 @@ export default function App() {
         }
         setDeferredPrompt(null);
       });
+    } else if (isIOS) {
+      // iOS: redirigir a la ruta real de la app para que Safari instale
+      // la PWA con el manifest correcto de esa ruta (no la landing).
+      // Agregamos ?install=1 para que la página destino muestre instrucciones.
+      const targetUrl = type === 'comprador' ? '/ciudadano?install=1' : '/casera/perfil?install=1';
+      window.location.href = targetUrl;
     } else {
-      // For iOS or browsers without native prompt, show instructions modal
+      // Fallback: mostrar modal de instrucciones
       setShowPwaModal(true);
     }
   };
