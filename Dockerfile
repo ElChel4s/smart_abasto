@@ -11,12 +11,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Next.js necesita las NEXT_PUBLIC_* en build time porque las embebe en el bundle del cliente.
-# Usamos valores hardcodeados como fallback para que el build nunca falle,
-# y en runtime se sobreescriben con las variables reales del docker-compose.
-ENV NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
-ENV NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=placeholder_key
-ENV NEXT_PUBLIC_STADIA_MAPS_API_KEY=placeholder_key
+# Recibir las variables en tiempo de construcción (imprescindible para NEXT_PUBLIC_)
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+ARG NEXT_PUBLIC_STADIA_MAPS_API_KEY
+
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+ENV NEXT_PUBLIC_STADIA_MAPS_API_KEY=$NEXT_PUBLIC_STADIA_MAPS_API_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
