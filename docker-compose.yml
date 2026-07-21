@@ -5,10 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
-        - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
-        - NEXT_PUBLIC_STADIA_MAPS_API_KEY=${NEXT_PUBLIC_STADIA_MAPS_API_KEY}
     container_name: smart-abasto-app
     ports:
       - "3000:3000"
