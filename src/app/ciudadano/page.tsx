@@ -38,7 +38,7 @@ export default function HomePage() {
               </span>
             </div>
             <h1 className="font-display text-4xl text-[var(--texto-fuerte)] font-extrabold leading-none tracking-tight">
-              Abasto <br/> 
+              Yanay <br/> 
               <span className="text-[var(--rojo-carmesi)]">GAMLP.</span>
             </h1>
             <p className="text-[var(--texto-suave)] text-xs font-medium mt-3 max-w-[200px]">

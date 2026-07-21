@@ -61,27 +61,11 @@ export default function App() {
 
   const handleInstallClick = (type: string) => {
     setInstallAppType(type);
-    
-    // If we have the deferred prompt (Android/Chrome/Windows)
-    if (deferredPrompt && !isIOS) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult: any) => {
-        if (choiceResult.outcome === 'accepted') {
-          setToastMsg(`Instalando App ${type === 'comprador' ? 'Ciudadana' : 'Caseras'}...`);
-          setTimeout(() => setToastMsg(null), 4000);
-        }
-        setDeferredPrompt(null);
-      });
-    } else if (isIOS) {
-      // iOS: redirigir a la ruta real de la app para que Safari instale
-      // la PWA con el manifest correcto de esa ruta (no la landing).
-      // Agregamos ?install=1 para que la página destino muestre instrucciones.
-      const targetUrl = type === 'comprador' ? '/ciudadano?install=1' : '/casera/perfil?install=1';
-      window.location.href = targetUrl;
-    } else {
-      // Fallback: mostrar modal de instrucciones
-      setShowPwaModal(true);
-    }
+    // Redirigir siempre a la ruta real de la app.
+    // Esa ruta tiene el manifest correcto → Android mostrará su prompt nativo,
+    // iOS mostrará el banner con instrucciones de "Agregar a Inicio".
+    const targetUrl = type === 'comprador' ? '/ciudadano?install=1' : '/casera/perfil?install=1';
+    window.location.href = targetUrl;
   };
 
   const closeInstallModal = () => setShowPwaModal(false);
@@ -227,7 +211,7 @@ export default function App() {
                 <i className="ph-fill ph-storefront block text-xl"></i>
               </div>
               <span className="font-display font-extrabold text-xl leading-tight text-[var(--texto-fuerte)]">
-                Portal de Abasto<br/>
+                Yanay<br/>
                 <span className="text-[var(--dorado-gamlp)] text-[10px] uppercase tracking-widest block -mt-1 font-sans font-bold">Plataforma Inteligente</span>
               </span>
             </div>
@@ -612,7 +596,7 @@ export default function App() {
             <div className="w-8 h-8 rounded-full border-2 border-[var(--dorado-gamlp)] text-[var(--rojo-carmesi)] flex items-center justify-center">
                <i className="ph-fill ph-storefront text-sm"></i>
             </div>
-            <span className="font-display font-bold text-xl text-[var(--texto-fuerte)]">Portal de Abasto</span>
+            <span className="font-display font-bold text-xl text-[var(--texto-fuerte)]">Yanay</span>
           </div>
           <p className="text-sm font-medium mt-2">Tecnología cívica para el comercio tradicional urbano.</p>
         </div>

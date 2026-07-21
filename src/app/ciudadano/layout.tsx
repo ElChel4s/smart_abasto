@@ -3,16 +3,16 @@ import { ReactNode } from 'react';
 import CiudadanoProviders from "./providers";
 
 export const metadata: Metadata = {
-  title: "Portal de Abasto - Ciudadano",
+  title: "Yanay - Ciudadano",
   description: "Busca precios justos, mercados abiertos y exige Peso Fiel en La Paz.",
   manifest: "/manifest-ciudadano.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Abasto Ciudadano",
+    title: "Yanay",
   },
   icons: {
-    apple: "https://api.dicebear.com/7.x/notionists/png?seed=AbastoCiudadano&backgroundColor=388e3c",
+    apple: "https://api.dicebear.com/7.x/notionists/png?seed=YanayCiudadano&backgroundColor=388e3c",
   },
 };
 

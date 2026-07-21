@@ -66,7 +66,7 @@ function CatalogoContent() {
       {/* Cabecera y Buscador Universal Exclusivo del Catálogo */}
       <div className="pattern-rafia px-6 pt-12 pb-4 relative shadow-sm border-b border-[var(--dorado-gamlp)]/30 shrink-0 sticky top-0 z-30">
         <h1 className="font-display text-2xl font-bold text-[var(--texto-fuerte)] flex items-center gap-2 mb-4">
-          <Search size={24} className="text-[var(--rojo-carmesi)]"/> Catálogo Abasto
+          <Search size={24} className="text-[var(--rojo-carmesi)]"/> Catálogo Yanay
         </h1>
         
         <div className="flex gap-2 mb-4 relative">
